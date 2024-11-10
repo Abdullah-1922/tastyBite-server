@@ -22,7 +22,8 @@ const getAllBlog = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await blogQuery.modelQuery;
-  return result;
+  const meta = await blogQuery.countTotal();
+  return { result, meta };
 };
 
 const deleteSingleBlog = async (id: string) => {

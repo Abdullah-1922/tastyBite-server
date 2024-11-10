@@ -8,14 +8,11 @@ const createStaffValidation = z.object({
     phoneNo: z.string().nonempty("Phone number is required"),
     designation: z.string().nonempty("Designation is required"),
     address: z.string().nonempty("Address is required"),
-    socialLink: z
-      .array(
-        z.object({
-          provider: z.enum(["facebook", "twitter", "linkedin", "instagram"]),
-          link: z.string().nonempty("Link is required"),
-        })
-      )
-      .nonempty("At least one social link is required"),
+    facebookLink: z.string().optional(),
+    bio: z.string().optional(),
+    linkedinLink: z.string().optional(),
+    instagramLink: z.string().optional(),
+    youtubeLink: z.string().optional(),
   }),
 });
 export const StaffValidation = {

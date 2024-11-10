@@ -1,26 +1,28 @@
-export const blogCategory = [
+
+export const BlogCategory = [
   {
     id: 1,
-    menuName: "Adventure Travel",
+    Name: "Fine Dining",
   },
   {
     id: 2,
-    menuName: "Beach",
+    Name: "Casual Dining",
   },
   {
     id: 3,
-    menuName: "Explore World",
+    Name: "Fast Food",
   },
   {
     id: 4,
-    menuName: "Family Holidays",
+    Name: "Cafe",
   },
   {
     id: 5,
-    menuName: "Art and culture",
+    Name: "Buffet",
   },
   {
     id: 6,
-    menuName: "Hill Travel",
+    Name: "Food Truck",
   },
 ];
+export const BlogCategoryNames = BlogCategory.map(category => category.Name);

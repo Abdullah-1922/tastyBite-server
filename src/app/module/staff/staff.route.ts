@@ -11,5 +11,8 @@ route.post(
   StaffController.createStaff
 );
 route.get("/", StaffController.getAllStaff);
+route.get("/:staffId", StaffController.getSingleStaff);
+route.patch("/:staffId", StaffController.updateStaff);
+route.delete("/:staffId", StaffController.deleteStaff);
 
 export const StaffRoutes = route;

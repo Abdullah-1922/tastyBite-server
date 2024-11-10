@@ -41,13 +41,10 @@ export class QueryBuilder<T> {
 
     return this;
   }
-  sort(section: string = "null") {
+  sort() {
     let sortBy = "-createdAt";
 
-    if (section === "commentSection") {
-      sortBy = "-helpful";
-    }
-
+ 
     if (this.query?.sortBy) {
       sortBy = this.query.sortBy as string;
     }

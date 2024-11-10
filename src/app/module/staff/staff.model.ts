@@ -3,22 +3,18 @@ import { TStaff } from "./staff.interface";
 
 const staffSchema = new Schema<TStaff>(
   {
-    email: { type: String, required: true },
+    email: { type: String, required: false },
     image: { type: String, required: true },
     name: { type: String, required: true },
     phoneNo: { type: String, required: true },
     designation: { type: String, required: true },
     address: { type: String, required: true },
-    socialLink: [
-      {
-        provider: {
-          type: String,
-          enum: ["facebook", "twitter", "linkedin", "instagram"],
-          required: true,
-        },
-        link: { type: String, required: true },
-      },
-    ],
+
+    facebookLink: { type: String, required: false },
+    bio: { type: String, required: false },
+    linkedinLink: { type: String, required: false },
+    instagramLink: { type: String, required: false },
+    youtubeLink: { type: String, required: false },
   },
   { timestamps: true, versionKey: false }
 );

@@ -11,6 +11,7 @@ type TExtra = {
 };
 
 export interface TFood {
+  
   name: string;
   description: string;
   images: string[];

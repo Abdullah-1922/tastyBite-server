@@ -23,7 +23,41 @@ const getAllStaff = catchAsync(async (req, res) => {
     success: true,
   });
 });
+const getSingleStaff = catchAsync(async (req, res) => {
+  const staff = await StaffService.getSingleStaff(req.params.staffId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Staff retrieved successfully",
+    data: staff,
+    success: true,
+  });
+});
+const updateStaff = catchAsync(async (req, res) => {
+  const staff = await StaffService.updateStaff(req.params.staffId, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Staff updated successfully",
+    data: staff,
+    success: true,
+  });
+});
+const deleteStaff = catchAsync(async (req, res) => {
+  const staff = await StaffService.deleteStaff(req.params.staffId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Staff deleted successfully",
+    data: staff,
+    success: true,
+  });
+});
+
 export const StaffController = {
   createStaff,
   getAllStaff,
+  getSingleStaff,
+  updateStaff,
+  deleteStaff,
 };

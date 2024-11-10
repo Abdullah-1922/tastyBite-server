@@ -1,12 +1,14 @@
 export type TStaff = {
-  email: string;
+  email?: string;
   image: string;
   name: string;
   phoneNo: string;
   designation: string;
   address: string;
-  socialLink: {
-    provider: "facebook" | "twitter" | "linkedin" | "instagram";
-    link: string;
-  }[];
+  bio?: string;
+  facebookLink?: string;
+ 
+  linkedinLink?: string;
+  instagramLink?: string;
+  youtubeLink?: string;
 };

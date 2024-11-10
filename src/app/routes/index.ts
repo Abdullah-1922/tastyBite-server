@@ -7,6 +7,7 @@ import { FeedbackRoutes } from "../module/feedback/feedback.route";
 import { MenuRoutes } from "../module/menu/menu.route";
 import { FoodRouters } from "../module/Food/food.route";
 import { StaffRoutes } from "../module/staff/staff.route";
+import { BlogCommentRoutes } from "../module/Blog comment/comment.route";
 
 const router = Router();
 
@@ -36,6 +37,10 @@ const moduleRoutes = [
   {
     path: "/feedback",
     route: FeedbackRoutes,
+  },
+  {
+    path: "/blog-comment",
+    route: BlogCommentRoutes,
   },
   {
     path: "/staff",

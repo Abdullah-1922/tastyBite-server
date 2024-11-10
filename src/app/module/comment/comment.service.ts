@@ -62,7 +62,7 @@ const getCommentForFood = async (
   )
     .search(["comment"])
     .filter()
-    .sort("commentSection")
+    .sort()
     .paginate()
     .fields();
   const result = await foodComment.modelQuery;
