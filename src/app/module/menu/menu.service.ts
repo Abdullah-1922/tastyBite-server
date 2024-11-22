@@ -32,6 +32,10 @@ const getSingleMenu = async (menuId: string) => {
   const res = await Menu.findById(menuId);
   return res;
 };
+const getFoodByMenu = async (menuId: string) => {
+  const res = await Food.find({ menuId });
+  return res;
+};
 const updateMenu = async (
   menuId: string,
   payload: Partial<TMenu>,
@@ -53,4 +57,5 @@ export const MenuServices = {
   getAllMenu,
   getSingleMenu,
   updateMenu,
+  getFoodByMenu
 };

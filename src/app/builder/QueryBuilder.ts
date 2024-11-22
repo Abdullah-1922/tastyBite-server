@@ -130,9 +130,9 @@ export class QueryBuilder<T> {
     }
 
     if (this.query.menu) {
-      queryObj.menu = { $in: this.query.menu as string[] };
+      queryObj.menuId = { $eq: this.query.menu as string };
     }
-
+   console.log(queryObj);
     Object.keys(queryObj).forEach((key) => {
       if (typeof queryObj[key] === "string") {
         queryObj[key] = { $regex: queryObj[key], $options: "i" };

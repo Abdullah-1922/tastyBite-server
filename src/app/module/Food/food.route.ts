@@ -12,6 +12,7 @@ router.post(
   FoodControllers.createFood
 );
 router.get("/", FoodControllers.getAllFood);
+router.post("/foodByIds", FoodControllers.getFoodsByIds);
 router.delete("/:foodId", FoodControllers.deleteFoodWithId);
 router.get("/:foodId", FoodControllers.getSingleFood);
 router.patch("/:foodId", FoodControllers.updateFood);

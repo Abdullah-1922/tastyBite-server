@@ -8,6 +8,8 @@ import { MenuRoutes } from "../module/menu/menu.route";
 import { FoodRouters } from "../module/Food/food.route";
 import { StaffRoutes } from "../module/staff/staff.route";
 import { BlogCommentRoutes } from "../module/Blog comment/comment.route";
+import { FoodFeedbackRouters } from "../module/foodFeedback/foodFeedback.route";
+import { ContactRoutes } from "../module/Contact/contact.route";
 
 const router = Router();
 
@@ -39,8 +41,16 @@ const moduleRoutes = [
     route: FeedbackRoutes,
   },
   {
+    path: "/food-feedback",
+    route: FoodFeedbackRouters,
+  },
+  {
     path: "/blog-comment",
     route: BlogCommentRoutes,
+  },
+  {
+    path: "/contact",
+    route: ContactRoutes,
   },
   {
     path: "/staff",

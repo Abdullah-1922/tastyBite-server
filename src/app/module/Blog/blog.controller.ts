@@ -24,6 +24,17 @@ const getAllBlog = catchAsync(async (req, res) => {
     meta: meta,
   });
 });
+// get all Search blog
+const getAllSearchBlog = catchAsync(async (req, res) => {
+  const { result, meta } = await BlogServices.getAllSearchBlog(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Blog with Search retrieved successfully",
+    data: result,
+    meta: meta,
+  });
+});
 
 // delete blog using id.......
 const deleteBlogWithId = catchAsync(async (req, res) => {
@@ -61,4 +72,5 @@ export const BlogControllers = {
   deleteBlogWithId,
   getSingleBlog,
   updateBlog,
+  getAllSearchBlog
 };

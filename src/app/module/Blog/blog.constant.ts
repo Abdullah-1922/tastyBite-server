@@ -1,4 +1,3 @@
-
 export const BlogCategory = [
   {
     id: 1,
@@ -25,4 +24,4 @@ export const BlogCategory = [
     Name: "Food Truck",
   },
 ];
-export const BlogCategoryNames = BlogCategory.map(category => category.Name);
+export const BlogCategoryNames = BlogCategory.map((category) => category.Name);

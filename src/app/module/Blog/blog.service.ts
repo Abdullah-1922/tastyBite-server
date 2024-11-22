@@ -25,6 +25,21 @@ const getAllBlog = async (query: Record<string, unknown>) => {
   const meta = await blogQuery.countTotal();
   return { result, meta };
 };
+const getAllSearchBlog = async (query: Record<string, unknown>) => {
+  const blogQuery = new QueryBuilder(
+    Blog.find().select(["image", "title", "createdAt"]),
+    query
+  )
+    .search(["BlogCategory", "title", "description"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await blogQuery.modelQuery;
+  const meta = await blogQuery.countTotal();
+  return { result, meta };
+};
 
 const deleteSingleBlog = async (id: string) => {
   const result = await Blog.findByIdAndDelete(id);
@@ -52,4 +67,5 @@ export const BlogServices = {
   deleteSingleBlog,
   getSingleBlog,
   updateBlog,
+  getAllSearchBlog
 };

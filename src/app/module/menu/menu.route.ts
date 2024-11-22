@@ -11,6 +11,7 @@ route.post(
   MenuControllers.createMenu
 );
 route.get("/", MenuControllers.getAllMenu);
+route.get("/all-food/:id", MenuControllers.getFoodByMenu);
 route.get("/:id", MenuControllers.getSingleMenu);
 route.patch("/:id", MenuControllers.updateMenu);
 route.delete("/:id", MenuControllers.deleteMenu);

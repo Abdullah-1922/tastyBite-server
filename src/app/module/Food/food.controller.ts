@@ -45,6 +45,15 @@ const getSingleFood = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getFoodsByIds = catchAsync(async (req, res) => {
+
+  const result = await FoodServices.getFoodsByIds(req.body);
+  res.status(200).json({
+    success: true,
+    message: "food retrieved successfully!",
+    data: result,
+  });
+});
 const updateFood = catchAsync(async (req, res) => {
   const foodId = req.params.foodId;
   const result = await FoodServices.updateFood(foodId, req.body);
@@ -61,4 +70,5 @@ export const FoodControllers = {
   deleteFoodWithId,
   getSingleFood,
   updateFood,
+  getFoodsByIds
 };

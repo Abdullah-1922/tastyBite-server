@@ -12,8 +12,8 @@ router.post(
   BlogControllers.createBlog,
 );
 router.get("/", BlogControllers.getAllBlog);
+router.get("/search", BlogControllers.getAllSearchBlog);
 router.delete("/:blogId", BlogControllers.deleteBlogWithId);
 router.get("/:blogId", BlogControllers.getSingleBlog);
 router.patch("/:blogId", BlogControllers.updateBlog);
-
 export const BlogRouter = router;
