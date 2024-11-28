@@ -16,8 +16,9 @@ const createUser = catchAsync(async (req, res) => {
 
 const updateUserRole = catchAsync(async (req, res) => {
 
-  const currentUser = req.headers["clerkid"] as string;
-  const result = await UserServices.updateUserRole(req.params.id,currentUser);
+  // const currentUser = req.headers["clerkid"] as string;
+  // const result = await UserServices.updateUserRole(req.params.id,req.body,currentUser);
+  const result = await UserServices.updateUserRole(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

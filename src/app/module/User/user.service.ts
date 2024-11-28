@@ -21,7 +21,74 @@ const createUser = async (userPayload: TUser) => {
   }
   return result;
 };
-const updateUserRole = async (clerkId: string, currentUserId: string) => {
+// const updateUserRole = async (
+//   clerkId: string,
+//   payload: { role: string },
+//   currentUserId: string
+// ) => {
+//   if (clerkId) {
+//     throw new AppError(404, "Clerk ID is Required");
+//   }
+//   const role = payload.role;
+//   // if(clerkId == process.env.SUPER_ADMIN){
+//   //   throw new AppError(httpStatus.BAD_REQUEST,"Can not change super admin status")
+//   // }
+//   //   const currentUser = await User.findOne({ clerkId: currentUserId }).select(
+//   //     "role"
+//   //   );
+//   //   let userRoll: string = "";
+//   //   if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") {
+//   //     throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized access");
+//   //   }
+//   //   const requestedUser = await User.findOne({ clerkId: clerkId });
+//   //   if (!requestedUser) {
+//   //     throw new AppError(httpStatus.NOT_FOUND, "User not found");
+//   //   }
+//   //   if (requestedUser.role === "superadmin") {
+//   //     throw new AppError(httpStatus.BAD_REQUEST, "Cannot update superadmin role");
+//   //   }
+//   //   if (requestedUser.role === "admin") {
+//   //     userRoll = "user";
+//   //     await User.findByIdAndUpdate(requestedUser._id, { role: "user" });
+//   //   }
+//   //   if (requestedUser.role === "user") {
+//   //     userRoll = "admin";
+//   //     await User.findByIdAndUpdate(requestedUser._id, { role: "admin" });
+//   //   }
+//   const user = await User.findByIdAndUpdate(
+//     currentUserId,
+//     { role: payload.role },
+//     { new: true }
+//   );
+//   if (!user) {
+//     throw new AppError(404, "User Unauthorized");
+//   }
+//   if (clerkId) {
+//     await clerkClient.users.updateUserMetadata(clerkId, {
+//       publicMetadata: {
+//         role: payload.role,
+//       },
+//     });
+//   }
+
+//   return user;
+// };
+const updateUserRole = async (payload: {
+  role: string;
+  _id: string;
+  clerkId: string;
+}) => {
+  const roll = ["user", "admin", "delivery man"];
+  if (!payload.clerkId) {
+    throw new AppError(404, "Clerk ID is Required");
+  }
+  if (!payload.role || !roll.includes(payload.role)) {
+    throw new AppError(404, "Role is Required");
+  }
+  if (!payload._id) {
+    throw new AppError(404, "User is Required");
+  }
+  const role = payload.role;
   // if(clerkId == process.env.SUPER_ADMIN){
   //   throw new AppError(httpStatus.BAD_REQUEST,"Can not change super admin status")
   // }
@@ -47,15 +114,23 @@ const updateUserRole = async (clerkId: string, currentUserId: string) => {
   //     userRoll = "admin";
   //     await User.findByIdAndUpdate(requestedUser._id, { role: "admin" });
   //   }
-  //   if (clerkId) {
-  //     await clerkClient.users.updateUserMetadata(clerkId, {
-  //       publicMetadata: {
-  //         role: userRoll,
-  //       },
-  //     });
-  //   }
-  //   const updatedRequestedUser = await User.findOne({ clerkId: clerkId });
-  //   return updatedRequestedUser;
+  const user = await User.findByIdAndUpdate(
+    payload._id,
+    { role: payload.role },
+    { new: true }
+  );
+  if (!user) {
+    throw new AppError(404, "User Unauthorized");
+  }
+  if (payload.clerkId) {
+    await clerkClient.users.updateUserMetadata(payload.clerkId, {
+      publicMetadata: {
+        role: payload.role,
+      },
+    });
+  }
+
+  return user;
 };
 
 const deleteUser = async (id: string) => {
@@ -91,7 +166,7 @@ const getAllUser = async (query: Record<string, unknown>) => {
   return result;
 };
 const getSingleUser = async (id: string) => {
-  const result = await User.find({ clerkId: id });
+  const result = await User.findOne({ clerkId: id });
 
   return result;
 };
@@ -102,22 +177,24 @@ const updateUser = async (payload: TUser) => {
   }
 
   type TUserProfile = {
-    firstName?: string;
-    imageUrl?: string;
+    name?: string;
     email?: string;
+    phone?: string;
   };
 
   const userProfile: TUserProfile = {};
 
   if (payload.name) {
-    userProfile.firstName = payload.name;
+    userProfile.name = payload.name;
+  }
+  if (payload.phone) {
+    userProfile.phone = payload.phone;
   }
 
-  if (payload.image) {
-    userProfile.imageUrl = payload.image;
+  if (payload.email) {
+    userProfile.email = payload.email;
   }
 
-  console.log(userProfile);
   const clerkRes = await clerkClient.users.updateUser(
     payload.clerkId as string,
     userProfile

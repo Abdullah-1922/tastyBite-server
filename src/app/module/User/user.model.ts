@@ -19,7 +19,7 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: ["deliveryBoy", "user", "manager", "cashier", "authority"],
+      enum: ["delivery man", "user", "admin"],
       default: "user",
     },
     image: {
@@ -32,7 +32,7 @@ const userSchema = new Schema<TUser>(
       default: false,
     },
     location: { type: [String], default: [] },
-    phone: { type: String, required: true },
+    phone: { type: String },
     paymentHistory: {
       type: [Schema.Types.ObjectId],
       ref: "payment",

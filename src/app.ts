@@ -22,6 +22,7 @@ app.use(
       "http://localhost:3001",
       "http://localhost:3000",
       "https://tasty-bite-website.vercel.app",
+      "https://tasty-bite-website-alpha.vercel.app"
     ],
     credentials: true,
   })

@@ -22,8 +22,9 @@ const updateUserValidationSchema = z.object({
     image: z.string({ invalid_type_error: "Invalid type" }).optional(),
     location: z.array(z.string()).optional(),
     phone: z.string({ required_error: "Phone is required" }).optional(),
-    role: z.enum(["authority", "user", "deliveryBoy", "manager", "cashier"]).optional(),
-    
+    role: z
+      .enum(["authority", "user", "delivery man", "manager", "cashier"])
+      .optional(),
   }),
 });
 

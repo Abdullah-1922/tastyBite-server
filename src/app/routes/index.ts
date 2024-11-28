@@ -10,6 +10,8 @@ import { StaffRoutes } from "../module/staff/staff.route";
 import { BlogCommentRoutes } from "../module/Blog comment/comment.route";
 import { FoodFeedbackRouters } from "../module/foodFeedback/foodFeedback.route";
 import { ContactRoutes } from "../module/Contact/contact.route";
+import { OrderRoutes } from "../module/order/order.route";
+import { StatsRoutes } from "../module/stats/stats.route";
 
 const router = Router();
 
@@ -47,6 +49,14 @@ const moduleRoutes = [
   {
     path: "/blog-comment",
     route: BlogCommentRoutes,
+  },
+  {
+    path: "/order",
+    route: OrderRoutes,
+  },
+  {
+    path: "/stats",
+    route: StatsRoutes,
   },
   {
     path: "/contact",
