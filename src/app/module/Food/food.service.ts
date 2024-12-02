@@ -19,7 +19,6 @@ const createFood = async (payload: Partial<TFood>) => {
   return res;
 };
 const getAllFood = async (query: Record<string, unknown>) => {
-  console.log(query);
   const FoodQuery = new QueryBuilder(Food.find().populate(["menuId"]), query)
     .search(["name", "description"])
     .filter()

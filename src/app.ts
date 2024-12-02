@@ -6,8 +6,7 @@ import notFound from "./app/middlewares/notFound";
 import globalErrorHandler from "./app/middlewares/globalErrorhandler";
 // import rateLimit from "express-rate-limit";
 import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
-// import paymentWebhookHandler from "./app/payment/payment-web-hook";
-// import { paymentController } from "./app/payment/payment";
+
 import Stripe from "stripe";
 
 const app: Application = express();
@@ -22,7 +21,9 @@ app.use(
       "http://localhost:3001",
       "http://localhost:3000",
       "https://tasty-bite-website.vercel.app",
-      "https://tasty-bite-website-alpha.vercel.app"
+      "https://tasty-bite-website-alpha.vercel.app",
+      "https://tasty-bite-dashboard.vercel.app",
+      "https://tasty-bite-web.vercel.app"
     ],
     credentials: true,
   })
@@ -51,8 +52,6 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 app.use("/api/v1", router);
 
-// Payment-related Routes
-// app.post("/api/v1/create-checkout-session", paymentController);
 
 // Health check route
 app.get("/", (req: Request, res: Response) => {

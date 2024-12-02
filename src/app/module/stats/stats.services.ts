@@ -1,3 +1,4 @@
+import { Food } from "../Food/food.model";
 import { Order } from "../order/order.model";
 import { Staff } from "../staff/staff.model";
 import { User } from "../User/user.model";
@@ -11,6 +12,7 @@ const getAllStats = async () => {
       },
     },
   ]);
+  const totalRecipe = await Food.find().countDocuments();
 
   const totalCompletedOrders = await Order.find({
     isCompleted: true,
@@ -85,6 +87,7 @@ const getAllStats = async () => {
   ]);
   const allStats = {
     totalSell,
+    totalRecipe,
     totalCompletedOrders,
     totalPendingOrders,
     totalCancelledOrders,

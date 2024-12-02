@@ -44,7 +44,6 @@ export class QueryBuilder<T> {
   sort() {
     let sortBy = "-createdAt";
 
- 
     if (this.query?.sortBy) {
       sortBy = this.query.sortBy as string;
     }
@@ -132,7 +131,7 @@ export class QueryBuilder<T> {
     if (this.query.menu) {
       queryObj.menuId = { $eq: this.query.menu as string };
     }
-   console.log(queryObj);
+
     Object.keys(queryObj).forEach((key) => {
       if (typeof queryObj[key] === "string") {
         queryObj[key] = { $regex: queryObj[key], $options: "i" };

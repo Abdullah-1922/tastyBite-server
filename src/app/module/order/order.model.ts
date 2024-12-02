@@ -29,4 +29,18 @@ const OrderSchema = new Schema<TOrder>(
   { timestamps: true }
 );
 
+const  orderCodeSchema = new Schema(
+  {
+    orderCode: { type: String, required: true },
+    order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    deliveryMan: { type: Schema.Types.ObjectId, ref: "User",required: true },
+  },
+  { timestamps: true }
+);
+export const OrderCode = mongoose.model("OrderCode", orderCodeSchema);
+
+
+
+
 export const Order = mongoose.model<TOrder>("Order", OrderSchema);

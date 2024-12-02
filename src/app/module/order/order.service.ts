@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Order } from "./order.model";
+import { Order, OrderCode } from "./order.model";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { TOrder } from "./order.interface";
@@ -8,6 +8,8 @@ import { User } from "../User/user.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import { orderStatus } from "./order.constant";
 import { generateInvoiceId } from "../../utils/invoice-id-generator";
+import { createNotification } from "../notification/notification.service";
+import { INotification } from "../notification/notification.interface";
 
 const createOrder = async (orderPayload: Partial<TOrder>) => {
   if (!orderPayload.clerkId) {
@@ -46,6 +48,14 @@ const getOrderById = async (id: string) => {
 };
 
 const getAllOrders = async (query: Record<string, unknown>) => {
+  if (query.isCancelled) {
+    query.isCancelled = query.isCancelled === "true" ? true : false;
+  }
+
+  if (query.isCompleted) {
+    query.isCompleted = query.isCompleted === "true" ? true : false;
+  }
+  console.log(query);
   const orderQuery = new QueryBuilder(
     Order.find().populate([
       { path: "foods.foodId", model: "Food" },
@@ -53,8 +63,12 @@ const getAllOrders = async (query: Record<string, unknown>) => {
       { path: "deliveryMan", model: "User" },
     ]),
     query
-  );
-
+  )
+    .search(["invoiceId", "orderStatus"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
   const result = await orderQuery.modelQuery;
   const meta = await orderQuery.countTotal();
   return { result, meta };
@@ -108,6 +122,9 @@ const updateOrderStatus = async (
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, "Order not found");
   }
+  if (order.orderStatus === payload.status) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Order already in this status");
+  }
   if (order.isCancelled) {
     throw new AppError(httpStatus.BAD_REQUEST, "Order is already cancelled");
   }
@@ -139,12 +156,101 @@ const updateOrderStatus = async (
   } else {
     object = { orderStatus: payload.status };
   }
-
+  if (payload.status === "PickedUp") {
+    object = {
+      orderStatus: payload.status,
+      isCompleted: true,
+      isCancelled: false,
+    };
+  }
   const result = await Order.findByIdAndUpdate(id, object, { new: true });
+  if (result) {
+    const notificationPayload: INotification = {
+      name: "",
+      description: "",
+      user: result?.user,
+      color: "#FFE0B5",
+      icon: "🍕",
+      time: new Date(),
+    };
+
+    switch (result.orderStatus) {
+      case "Order Placed":
+        notificationPayload.name = "Order Placed";
+        notificationPayload.description =
+          "Thank you for your order! We’re getting it ready.";
+        break;
+      case "Order Confirmed":
+        notificationPayload.name = "Order Confirmed";
+        notificationPayload.description =
+          "Your order has been confirmed. Stay tuned!";
+        break;
+      case "Cooking":
+        notificationPayload.name = "Cooking in Progress";
+        notificationPayload.description =
+          "Your delicious meal is being prepared.";
+        break;
+      case "Out For Delivery":
+        notificationPayload.name = "Out For Delivery";
+        notificationPayload.description =
+          "Your order is on the way! Get ready!";
+        break;
+      case "Delivered":
+        notificationPayload.name = "Order Delivered";
+        notificationPayload.description =
+          "Enjoy your meal! Thank you for ordering.";
+        break;
+      case "Cancelled":
+        notificationPayload.name = "Order Cancelled";
+        notificationPayload.description =
+          "We’re sorry your order was cancelled. Let us know if we can help.";
+        break;
+      default:
+        notificationPayload.name = "Order Status Updated";
+        notificationPayload.description = `Your order status has been updated to ${result.orderStatus}`;
+        break;
+    }
+    await createNotification(notificationPayload);
+  }
+
+  if (result?.orderStatus === "Out For Delivery") {
+    const generateDeliveryCode = () => {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    };
+
+    const deliveryCode = generateDeliveryCode();
+
+    const notificationPayloadForCode: INotification = {
+      name: "Delivery Code",
+      description: `Your delivery code is ${deliveryCode}`,
+      user: result?.user,
+      color: "#FF3D71",
+      icon: "🔑",
+      time: new Date(),
+    };
+
+    await createNotification(notificationPayloadForCode);
+
+    const orderCode = {
+      orderCode: deliveryCode,
+      order: result._id,
+      user: result.user,
+      deliveryMan: result.deliveryMan,
+    };
+    await OrderCode.create(orderCode);
+  }
+
   return result;
 };
 
 const getUserOrders = async (userId: string, query: any) => {
+  if (query.isCancelled) {
+    query.isCancelled = query.isCancelled === "true" ? true : false;
+  }
+
+  if (query.isCompleted) {
+    query.isCompleted = query.isCompleted === "true" ? true : false;
+  }
   const user = await User.findOne({ clerkId: userId });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -157,7 +263,12 @@ const getUserOrders = async (userId: string, query: any) => {
       { path: "deliveryMan", model: "User" },
     ]),
     query
-  );
+  )
+    .search(["invoiceId", "orderStatus"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
   const result = await orderQuery.modelQuery;
   const meta = await orderQuery.countTotal();
@@ -165,14 +276,17 @@ const getUserOrders = async (userId: string, query: any) => {
   return { result, meta };
 };
 const getDeliveryManOrders = async (deliveryManId: string, query: any) => {
+  if (query.isCancelled) {
+    query.isCancelled = query.isCancelled === "true" ? true : false;
+  }
+
+  if (query.isCompleted) {
+    query.isCompleted = query.isCompleted === "true" ? true : false;
+  }
   const user = await User.findOne({ clerkId: deliveryManId });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
-  }
-
   const orderQuery = new QueryBuilder(
     Order.find({ deliveryMan: user._id }).populate([
       { path: "foods.foodId", model: "Food" },
@@ -180,7 +294,12 @@ const getDeliveryManOrders = async (deliveryManId: string, query: any) => {
       { path: "deliveryMan", model: "User" },
     ]),
     query
-  );
+  )
+    .search(["invoiceId", "orderStatus"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
   const result = await orderQuery.modelQuery;
   const meta = await orderQuery.countTotal();

@@ -15,15 +15,19 @@ const createMenu = catchAsync(async (req, res) => {
   });
 });
 const getAllMenu = catchAsync(async (req, res) => {
-  const result = await MenuServices.getAllMenu();
+  const {meta,result} = await MenuServices.getAllMenu(req.query);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Menu retrieved successfully",
     data: result,
+    meta
   });
 });
+
+
+
 const getSingleMenu = catchAsync(async (req, res) => {
   const result = await MenuServices.getSingleMenu(req.params.id);
 
@@ -35,13 +39,14 @@ const getSingleMenu = catchAsync(async (req, res) => {
   });
 });
 const getFoodByMenu = catchAsync(async (req, res) => {
-  const result = await MenuServices.getFoodByMenu(req.params.id);
+  const {meta,result} = await MenuServices.getFoodByMenu(req.params.id,req.query);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Foods retrieved by menu successfully",
     data: result,
+    meta
   });
 });
 const updateMenu = catchAsync(async (req, res) => {

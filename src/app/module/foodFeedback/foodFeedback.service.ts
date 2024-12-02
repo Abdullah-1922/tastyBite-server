@@ -13,9 +13,8 @@ const createFeedback = async (payload: Partial<TFoodFeedback>) => {
     throw new AppError(400, "Clerk ID is required");
   }
 
-  // const user = await User.findOne({clerkId:"user_2npvSYgJ4PVW52Tj4Y1uQWCEMol"});
-  const user = await User.findOne();
-  console.log(user);
+ 
+  const user = await User.findOne({ clerkId: payload.clerkId });
 
   if (!user) {
     throw new AppError(404, "User not found");
@@ -47,12 +46,7 @@ const getAllFeedbackByFoodId = async (
   const meta = await feedbackQuery.countTotal();
   return { feedbacks, meta };
 };
-const getAllFeedback = async (
-
-  query: Record<string, unknown>
-) => {
-
-
+const getAllFeedback = async (query: Record<string, unknown>) => {
   const feedbackQuery = new QueryBuilder(
     FoodFeedback.find().populate(["user"]),
     query
@@ -93,5 +87,5 @@ export const FoodFeedbackServices = {
   getAllFeedbackByFoodId,
   updateFeedback,
   deleteFeedback,
-  getAllFeedback
+  getAllFeedback,
 };

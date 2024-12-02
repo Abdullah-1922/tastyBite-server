@@ -12,6 +12,7 @@ import { FoodFeedbackRouters } from "../module/foodFeedback/foodFeedback.route";
 import { ContactRoutes } from "../module/Contact/contact.route";
 import { OrderRoutes } from "../module/order/order.route";
 import { StatsRoutes } from "../module/stats/stats.route";
+import { NotificationRoutes } from "../module/notification/noifcation.route";
 
 const router = Router();
 
@@ -65,6 +66,10 @@ const moduleRoutes = [
   {
     path: "/staff",
     route: StaffRoutes,
+  },
+  {
+    path: "/notification",
+    route: NotificationRoutes,
   },
 ];
 
