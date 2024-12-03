@@ -94,7 +94,21 @@ const getDeliveryManOrders = catchAsync(async (req, res) => {
     data: result,
     meta,
   });
+
+
 });
+const OrderComplete = catchAsync(async (req, res) => {
+  const result = await OrderServices.CompleteOrder(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Order completed successfully",
+    data: result,
+  });
+});
+
+
 export const OrderControllers = {
   createOrder,
   getOrderById,
@@ -104,4 +118,5 @@ export const OrderControllers = {
   updateOrderStatus,
   getUserOrders,
   getDeliveryManOrders,
+  OrderComplete
 };

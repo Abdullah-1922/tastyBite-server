@@ -102,6 +102,35 @@ const getAllStats = async () => {
   return allStats;
 };
 
+const getStatsForUser = async (userId: string) => {
+const user=await User.findOne({clerkId:userId})
+
+  const totalOrders = await Order.find({ user:user?._id }).countDocuments();
+  const runningOrders = await Order.find({
+    user:user?._id,
+    isCompleted: false,
+    isCancelled: false,
+  }).countDocuments();
+  const cancelledOrders = await Order.find({
+    user:user?._id,
+    isCancelled: true,
+  }).countDocuments();
+  const completedOrders = await Order.find({
+    user:user?._id,
+    isCompleted: true,
+  }).countDocuments();
+
+  const userStats = {
+    totalOrders,
+    runningOrders,
+    cancelledOrders,
+    completedOrders,
+  };
+
+  return userStats;
+};
+
 export const StatsServices = {
   getAllStats,
+  getStatsForUser,
 };

@@ -10,6 +10,7 @@ import { orderStatus } from "./order.constant";
 import { generateInvoiceId } from "../../utils/invoice-id-generator";
 import { createNotification } from "../notification/notification.service";
 import { INotification } from "../notification/notification.interface";
+import { Food } from "../Food/food.model";
 
 const createOrder = async (orderPayload: Partial<TOrder>) => {
   if (!orderPayload.clerkId) {
@@ -32,6 +33,17 @@ const createOrder = async (orderPayload: Partial<TOrder>) => {
   }
 
   const result = await Order.create(orderPayload);
+
+  if (result && orderPayload.foods) {
+    await Promise.all(
+      orderPayload.foods.map(async (food) => {
+        await Food.findByIdAndUpdate(food.foodId, {
+          $push: { orders: result._id },
+        });
+      })
+    );
+  }
+
   return result;
 };
 
@@ -102,7 +114,6 @@ const updateOrderStatus = async (
       | "Cooking"
       | "Out For Delivery"
       | "Delivered"
-      | "PickedUp"
       | "Cancelled";
     deliveryMan?: string;
   }
@@ -156,13 +167,7 @@ const updateOrderStatus = async (
   } else {
     object = { orderStatus: payload.status };
   }
-  if (payload.status === "PickedUp") {
-    object = {
-      orderStatus: payload.status,
-      isCompleted: true,
-      isCancelled: false,
-    };
-  }
+
   const result = await Order.findByIdAndUpdate(id, object, { new: true });
   if (result) {
     const notificationPayload: INotification = {
@@ -194,11 +199,6 @@ const updateOrderStatus = async (
         notificationPayload.name = "Out For Delivery";
         notificationPayload.description =
           "Your order is on the way! Get ready!";
-        break;
-      case "Delivered":
-        notificationPayload.name = "Order Delivered";
-        notificationPayload.description =
-          "Enjoy your meal! Thank you for ordering.";
         break;
       case "Cancelled":
         notificationPayload.name = "Order Cancelled";
@@ -239,6 +239,51 @@ const updateOrderStatus = async (
     };
     await OrderCode.create(orderCode);
   }
+
+  return result;
+};
+
+const CompleteOrder = async (payload: any) => {
+  if (!payload.orderId || !payload.deliveryCode) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "orderId and deliveryCode is required"
+    );
+  }
+
+  const order = await Order.findById(payload.orderId);
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found");
+  }
+  if (order.isCompleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Order already completed");
+  }
+  const orderCode = await OrderCode.findOne({ order: order._id });
+  if (!orderCode) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Delivery code not found");
+  }
+  if (orderCode.orderCode !== payload.deliveryCode) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid delivery code");
+  }
+  const result = await Order.findByIdAndUpdate(
+    order._id,
+    { isCompleted: true, orderStatus: "Delivered" },
+    { new: true }
+  );
+
+  const notificationPayload: INotification = {
+    name: "Order Delivered",
+    description:
+      "Your order has been successfully delivered. We hope you enjoy your meal! Thank you for choosing TastyBite!",
+    user: order?.user,
+    color: "#A8CD89",
+    icon: "🎉",
+    time: new Date(),
+  };
+
+  await createNotification(notificationPayload);
+
+  await OrderCode.findByIdAndDelete(orderCode._id);
 
   return result;
 };
@@ -316,4 +361,5 @@ export const OrderServices = {
   updateOrderStatus,
   getUserOrders,
   getDeliveryManOrders,
+  CompleteOrder,
 };

@@ -103,7 +103,7 @@ export class QueryBuilder<T> {
       const ratingConditions = starRatings.map((rating) => ({
         totalAverageRating: { $gte: rating, $lt: rating + 1 },
       }));
-      console.log(ratingConditions);
+
       this.modelQuery = this.modelQuery.find({
         ...queryObj,
         $and: [
@@ -130,6 +130,11 @@ export class QueryBuilder<T> {
 
     if (this.query.menu) {
       queryObj.menuId = { $eq: this.query.menu as string };
+    }
+    if (this.query.sortBy === "orders") {
+      this.modelQuery = this.modelQuery.sort({
+        "orders.length": 1,
+      });
     }
 
     Object.keys(queryObj).forEach((key) => {
