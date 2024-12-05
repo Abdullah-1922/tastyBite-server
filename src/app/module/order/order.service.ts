@@ -184,26 +184,32 @@ const updateOrderStatus = async (
         notificationPayload.name = "Order Placed";
         notificationPayload.description =
           "Thank you for your order! We’re getting it ready.";
+        
         break;
       case "Order Confirmed":
         notificationPayload.name = "Order Confirmed";
         notificationPayload.description =
           "Your order has been confirmed. Stay tuned!";
+          
         break;
       case "Cooking":
         notificationPayload.name = "Cooking in Progress";
         notificationPayload.description =
           "Your delicious meal is being prepared.";
+          notificationPayload.icon = "🍳";
         break;
       case "Out For Delivery":
         notificationPayload.name = "Out For Delivery";
         notificationPayload.description =
           "Your order is on the way! Get ready!";
+        notificationPayload.icon = "🚚";
         break;
       case "Cancelled":
         notificationPayload.name = "Order Cancelled";
         notificationPayload.description =
           "We’re sorry your order was cancelled. Let us know if we can help.";
+        notificationPayload.color = "#FF3D71";
+        notificationPayload.icon = "❌";
         break;
       default:
         notificationPayload.name = "Order Status Updated";

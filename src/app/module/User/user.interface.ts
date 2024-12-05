@@ -4,7 +4,7 @@ export interface TUser {
   clerkId: string;
   email?: string;
   name: string;
-  role: "authority" | "user"| "delivery man"|"manager"|"cashier";
+  role:  "user"| "delivery man"|"admin";
   isDeleted: boolean;
   image?: string;
   phone?:string;

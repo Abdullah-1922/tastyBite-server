@@ -8,6 +8,7 @@ import httpStatus from "http-status";
 
 import { Comment } from "../comment/comment.model";
 import { Blog } from "../Blog/blog.model";
+import Notification from "../notification/notification.model";
 
 const createUser = async (userPayload: TUser) => {
   const result = await User.create(userPayload);
@@ -89,31 +90,7 @@ const updateUserRole = async (payload: {
     throw new AppError(404, "User is Required");
   }
   const role = payload.role;
-  // if(clerkId == process.env.SUPER_ADMIN){
-  //   throw new AppError(httpStatus.BAD_REQUEST,"Can not change super admin status")
-  // }
-  //   const currentUser = await User.findOne({ clerkId: currentUserId }).select(
-  //     "role"
-  //   );
-  //   let userRoll: string = "";
-  //   if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") {
-  //     throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized access");
-  //   }
-  //   const requestedUser = await User.findOne({ clerkId: clerkId });
-  //   if (!requestedUser) {
-  //     throw new AppError(httpStatus.NOT_FOUND, "User not found");
-  //   }
-  //   if (requestedUser.role === "superadmin") {
-  //     throw new AppError(httpStatus.BAD_REQUEST, "Cannot update superadmin role");
-  //   }
-  //   if (requestedUser.role === "admin") {
-  //     userRoll = "user";
-  //     await User.findByIdAndUpdate(requestedUser._id, { role: "user" });
-  //   }
-  //   if (requestedUser.role === "user") {
-  //     userRoll = "admin";
-  //     await User.findByIdAndUpdate(requestedUser._id, { role: "admin" });
-  //   }
+
   const user = await User.findByIdAndUpdate(
     payload._id,
     { role: payload.role },
@@ -122,6 +99,51 @@ const updateUserRole = async (payload: {
   if (!user) {
     throw new AppError(404, "User Unauthorized");
   }
+  if (user) {
+    const getRoleChangeNotification = (
+      newRole: "admin" | "user" | "delivery man",
+      user: string
+    ) => {
+      const roleDetails = {
+        admin: {
+          description:
+            "You have been promoted to Admin. Manage the platform responsibly!",
+          color: "#4CAF50",
+          icon: "🛡️",
+        },
+        user: {
+          description:
+            "Your role has been updated to User. Enjoy exploring the platform!",
+          color: "#2196F3",
+          icon: "👤",
+        },
+        "delivery man": {
+          description:
+            "You are now a DeliveryMan. Get ready to deliver orders efficiently!",
+          color: "#FF9800",
+          icon: "🚚",
+        },
+      };
+
+      return {
+        name: "Role Updated",
+        description:
+          roleDetails[newRole]?.description || "Your role has been updated.",
+        user: user,
+        color: roleDetails[newRole]?.color || "#000000",
+        icon: roleDetails[newRole]?.icon || "ℹ️",
+        time: new Date(),
+      };
+    };
+
+    // Example usage:
+    const notificationPayload = getRoleChangeNotification(
+      user?.role,
+      user?._id.toString()
+    );
+    await Notification.create(notificationPayload);
+  }
+
   if (payload.clerkId) {
     await clerkClient.users.updateUserMetadata(payload.clerkId, {
       publicMetadata: {
