@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Order, OrderCode } from "./order.model";
-import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
-import { TOrder } from "./order.interface";
-import { User } from "../User/user.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
-import { orderStatus } from "./order.constant";
+import AppError from "../../errors/AppError";
 import { generateInvoiceId } from "../../utils/invoice-id-generator";
-import { createNotification } from "../notification/notification.service";
-import { INotification } from "../notification/notification.interface";
+import { pusherServer } from "../../utils/pusher";
 import { Food } from "../Food/food.model";
+import { INotification } from "../notification/notification.interface";
+import { createNotification } from "../notification/notification.service";
+import { User } from "../User/user.model";
+import { orderStatus } from "./order.constant";
+import { TOrder } from "./order.interface";
+import { Order, OrderCode } from "./order.model";
 
 const createOrder = async (orderPayload: Partial<TOrder>) => {
   if (!orderPayload.clerkId) {
@@ -184,19 +185,19 @@ const updateOrderStatus = async (
         notificationPayload.name = "Order Placed";
         notificationPayload.description =
           "Thank you for your order! We’re getting it ready.";
-        
+
         break;
       case "Order Confirmed":
         notificationPayload.name = "Order Confirmed";
         notificationPayload.description =
           "Your order has been confirmed. Stay tuned!";
-          
+
         break;
       case "Cooking":
         notificationPayload.name = "Cooking in Progress";
         notificationPayload.description =
           "Your delicious meal is being prepared.";
-          notificationPayload.icon = "🍳";
+        notificationPayload.icon = "🍳";
         break;
       case "Out For Delivery":
         notificationPayload.name = "Out For Delivery";
@@ -216,7 +217,21 @@ const updateOrderStatus = async (
         notificationPayload.description = `Your order status has been updated to ${result.orderStatus}`;
         break;
     }
-    await createNotification(notificationPayload);
+    const notificationResult = await createNotification(notificationPayload);
+
+    try {
+      const user = await User.findById(order?.user);
+
+      if (user?.clerkId) {
+        await pusherServer.trigger(
+          user.clerkId,
+          "notification:new",
+          notificationResult
+        );
+      }
+    } catch (error) {
+      console.log("Failed to send notification:", error);
+    }
   }
 
   if (result?.orderStatus === "Out For Delivery") {
@@ -235,7 +250,23 @@ const updateOrderStatus = async (
       time: new Date(),
     };
 
-    await createNotification(notificationPayloadForCode);
+    const notificationResult = await createNotification(
+      notificationPayloadForCode
+    );
+
+    try {
+      const user = await User.findById(order?.user);
+
+      if (user?.clerkId) {
+        await pusherServer.trigger(
+          user.clerkId,
+          "notification:new",
+          notificationResult
+        );
+      }
+    } catch (error) {
+      console.log("Failed to send notification:", error);
+    }
 
     const orderCode = {
       orderCode: deliveryCode,
@@ -287,7 +318,21 @@ const CompleteOrder = async (payload: any) => {
     time: new Date(),
   };
 
-  await createNotification(notificationPayload);
+  const notificationResult = await createNotification(notificationPayload);
+
+  try {
+    const user = await User.findById(order?.user);
+
+    if (user?.clerkId) {
+      await pusherServer.trigger(
+        user.clerkId,
+        "notification:new",
+        notificationResult
+      );
+    }
+  } catch (error) {
+    console.log("Failed to send notification:", error);
+  }
 
   await OrderCode.findByIdAndDelete(orderCode._id);
 

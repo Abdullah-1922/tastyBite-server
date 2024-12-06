@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Notification from "./notification.model";
-import { INotification } from "./notification.interface";
-import { User } from "../User/user.model";
-import { QueryBuilder } from "../../builder/QueryBuilder";
 import mongoose from "mongoose";
+import { QueryBuilder } from "../../builder/QueryBuilder";
+import { User } from "../User/user.model";
+import { INotification } from "./notification.interface";
+import Notification from "./notification.model";
 export const createNotification = async (data: INotification) => {
   if (data.user && !mongoose.Types.ObjectId.isValid(data.user)) {
     const user = await User.findOne({ clerkId: data.user });
