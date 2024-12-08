@@ -23,7 +23,7 @@ const OrderSchema = new Schema<TOrder>(
       enum: orderStatus,
       default: "Order Placed",
     },
-    deliveryLocation: { type: String, required: true },
+    deliveryLocation: { type: Schema.Types.ObjectId, required: true },
     totalPrice: { type: Number, required: true },
   },
   { timestamps: true }

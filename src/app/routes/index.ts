@@ -13,6 +13,7 @@ import { ContactRoutes } from "../module/Contact/contact.route";
 import { OrderRoutes } from "../module/order/order.route";
 import { StatsRoutes } from "../module/stats/stats.route";
 import { NotificationRoutes } from "../module/notification/noifcation.route";
+import { DeliveryLocationRoutes } from "../module/deliveryLocation/deliveryLocation.route";
 
 const router = Router();
 
@@ -70,6 +71,10 @@ const moduleRoutes = [
   {
     path: "/notification",
     route: NotificationRoutes,
+  },
+  {
+    path: "/delivery-location",
+    route: DeliveryLocationRoutes,
   },
 ];
 

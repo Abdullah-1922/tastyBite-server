@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { QueryBuilder } from "../../builder/QueryBuilder";
+import AppError from "../../errors/AppError";
 import { Contact } from "./contact.model";
 
-const createContact = async (payload:any) => {
+const createContact = async (payload: any) => {
   const contact = await Contact.create(payload);
   return contact;
 };
 
-const getAllContacts = async (query:any) => {
+const getAllContacts = async (query: any) => {
   const contactQuery = new QueryBuilder(Contact.find(), query)
     .search(["firstName", "lastName", "email", "message"])
     .filter()
@@ -21,10 +22,10 @@ const getAllContacts = async (query:any) => {
   return { result, meta };
 };
 
-const deleteContactById = async (contactId:string) => {
+const deleteContactById = async (contactId: string) => {
   const result = await Contact.findByIdAndDelete(contactId);
   if (!result) {
-    throw new Error("Contact not found");
+    throw new AppError(404,"Contact not found");
   }
 };
 

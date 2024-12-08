@@ -8,7 +8,7 @@ export interface TUser {
   isDeleted: boolean;
   image?: string;
   phone?:string;
-  location?:string[];
+  location?:Types.ObjectId[];
   paymentHistory: Types.ObjectId[]
   createdAt: Date;
   updatedAt:Date;
