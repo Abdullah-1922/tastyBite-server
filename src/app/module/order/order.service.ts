@@ -53,6 +53,7 @@ const getOrderById = async (id: string) => {
     { path: "foods.foodId", model: "Food" },
     { path: "user", model: "User" },
     { path: "deliveryMan", model: "User" },
+    { path: "deliveryLocation", model: "DeliveryLocation" },
   ]);
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, "Order not found");
@@ -74,6 +75,7 @@ const getAllOrders = async (query: Record<string, unknown>) => {
       { path: "foods.foodId", model: "Food" },
       { path: "user", model: "User" },
       { path: "deliveryMan", model: "User" },
+      { path: "deliveryLocation", model: "DeliveryLocation" },
     ]),
     query
   )
@@ -357,6 +359,7 @@ const getUserOrders = async (userId: string, query: any) => {
       { path: "foods.foodId", model: "Food" },
       { path: "user", model: "User" },
       { path: "deliveryMan", model: "User" },
+      { path: "deliveryLocation", model: "DeliveryLocation" },
     ]),
     query
   )
@@ -388,6 +391,7 @@ const getDeliveryManOrders = async (deliveryManId: string, query: any) => {
       { path: "foods.foodId", model: "Food" },
       { path: "user", model: "User" },
       { path: "deliveryMan", model: "User" },
+      { path: "deliveryLocation", model: "DeliveryLocation" },
     ]),
     query
   )

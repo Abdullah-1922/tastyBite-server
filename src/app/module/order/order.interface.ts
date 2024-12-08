@@ -19,7 +19,7 @@ export type TOrder = {
     | "Delivered"
     | "PickedUp"
     | "Cancelled";
-  deliveryLocation: string;
+  deliveryLocation: Types.ObjectId;
   totalPrice: number;
   createdAt?: Date;
   updatedAt?: Date;

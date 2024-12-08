@@ -4,11 +4,12 @@ import { QueryBuilder } from "../../builder/QueryBuilder";
 import { User } from "../User/user.model";
 import { INotification } from "./notification.interface";
 import Notification from "./notification.model";
+import AppError from "../../errors/AppError";
 export const createNotification = async (data: INotification) => {
   if (data.user && !mongoose.Types.ObjectId.isValid(data.user)) {
     const user = await User.findOne({ clerkId: data.user });
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError(404,"User not found");
     }
     data.user = user._id;
   }
@@ -20,7 +21,7 @@ export const createNotification = async (data: INotification) => {
 export const getNotificationsByUser = async (userId: string, query: any) => {
   const user = await User.findOne({ clerkId: userId });
   if (!user) {
-    throw new Error("User not found");
+    throw new AppError(404,"User not found");
   }
   // Remove undefined values from query object
   Object.keys(query).forEach((key) => {
@@ -58,7 +59,7 @@ export const deleteUserNotificationService = async (
 
   const user = await User.findOne({ clerkId: userId });
   if (!user) {
-    throw new Error("User not found");
+    throw new AppError(404,"User not found");
   }
   Object.keys(query).forEach((key) => {
     if (query[key] === "undefined") {

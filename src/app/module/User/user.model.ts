@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 import { TStripeUser, TUser } from "./user.interface";
 
 const userSchema = new Schema<TUser>(
@@ -31,7 +31,7 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
-    location: { type: [String], default: [] },
+    location: { type: [Schema.Types.ObjectId], default: [] ,ref:"DeliveryLocation"},
     phone: { type: String },
     paymentHistory: {
       type: [Schema.Types.ObjectId],
