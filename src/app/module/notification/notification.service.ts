@@ -1,20 +1,45 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from "mongoose";
+import mongoose, { Error } from "mongoose";
 import { QueryBuilder } from "../../builder/QueryBuilder";
+import AppError from "../../errors/AppError";
+import { pusherServer } from "../../utils/pusher";
 import { User } from "../User/user.model";
 import { INotification } from "./notification.interface";
 import Notification from "./notification.model";
 export const createNotification = async (data: INotification) => {
   if (data.user && !mongoose.Types.ObjectId.isValid(data.user)) {
     const user = await User.findOne({ clerkId: data.user });
+
     if (!user) {
       throw new Error("User not found");
     }
     data.user = user._id;
   }
 
+  if (!data.user) return;
+
   const notification = new Notification(data);
-  return await notification.save();
+  const notificationResult = await notification.save();
+
+  const clerkUser = await User.findById(data.user);
+
+  if (!clerkUser)
+    throw new AppError(
+      404,
+      "User not found in the database. Please check the details and try again."
+    );
+
+  try {
+    await pusherServer.trigger(
+      clerkUser?.clerkId,
+      "notification:new",
+      notificationResult
+    );
+  } catch (error: any) {
+    throw new AppError(500, error?.message);
+  }
+
+  return notificationResult;
 };
 
 export const getNotificationsByUser = async (userId: string, query: any) => {

@@ -4,7 +4,6 @@ import httpStatus from "http-status";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { generateInvoiceId } from "../../utils/invoice-id-generator";
-import { pusherServer } from "../../utils/pusher";
 import { Food } from "../Food/food.model";
 import { INotification } from "../notification/notification.interface";
 import { createNotification } from "../notification/notification.service";
@@ -170,6 +169,21 @@ const updateOrderStatus = async (
   }
 
   const result = await Order.findByIdAndUpdate(id, object, { new: true });
+
+  if (result?.orderStatus === "Out For Delivery" && result?.deliveryMan) {
+    const notificationPayload: INotification = {
+      name: "New Delivery Assigned!",
+      description:
+        "You have a new delivery. Please check the details in your dashboard.",
+      user: result?.deliveryMan,
+      color: "#D4EDDA", // Light green to represent success or new assignment
+      icon: "🚚",
+      time: new Date(),
+    };
+
+    await createNotification(notificationPayload);
+  }
+
   if (result) {
     const notificationPayload: INotification = {
       name: "",
@@ -217,21 +231,7 @@ const updateOrderStatus = async (
         notificationPayload.description = `Your order status has been updated to ${result.orderStatus}`;
         break;
     }
-    const notificationResult = await createNotification(notificationPayload);
-
-    try {
-      const user = await User.findById(order?.user);
-
-      if (user?.clerkId) {
-        await pusherServer.trigger(
-          user.clerkId,
-          "notification:new",
-          notificationResult
-        );
-      }
-    } catch (error) {
-      console.log("Failed to send notification:", error);
-    }
+    await createNotification(notificationPayload);
   }
 
   if (result?.orderStatus === "Out For Delivery") {
@@ -250,23 +250,7 @@ const updateOrderStatus = async (
       time: new Date(),
     };
 
-    const notificationResult = await createNotification(
-      notificationPayloadForCode
-    );
-
-    try {
-      const user = await User.findById(order?.user);
-
-      if (user?.clerkId) {
-        await pusherServer.trigger(
-          user.clerkId,
-          "notification:new",
-          notificationResult
-        );
-      }
-    } catch (error) {
-      console.log("Failed to send notification:", error);
-    }
+    await createNotification(notificationPayloadForCode);
 
     const orderCode = {
       orderCode: deliveryCode,
@@ -318,21 +302,7 @@ const CompleteOrder = async (payload: any) => {
     time: new Date(),
   };
 
-  const notificationResult = await createNotification(notificationPayload);
-
-  try {
-    const user = await User.findById(order?.user);
-
-    if (user?.clerkId) {
-      await pusherServer.trigger(
-        user.clerkId,
-        "notification:new",
-        notificationResult
-      );
-    }
-  } catch (error) {
-    console.log("Failed to send notification:", error);
-  }
+  await createNotification(notificationPayload);
 
   await OrderCode.findByIdAndDelete(orderCode._id);
 
