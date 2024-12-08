@@ -225,7 +225,7 @@ const updateOrderStatus = async (
         notificationPayload.name = "Order Cancelled";
         notificationPayload.description =
           "We’re sorry your order was cancelled. Let us know if we can help.";
-        notificationPayload.color = "#FF3D71";
+        notificationPayload.color = "#FFFFFF";
         notificationPayload.icon = "❌";
         break;
       default:
