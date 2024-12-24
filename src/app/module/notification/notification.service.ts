@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose, { Error } from "mongoose";
+import mongoose from "mongoose";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { pusherServer } from "../../utils/pusher";
 import { User } from "../User/user.model";
 import { INotification } from "./notification.interface";
 import Notification from "./notification.model";
-import AppError from "../../errors/AppError";
 export const createNotification = async (data: INotification) => {
   if (data.user && !mongoose.Types.ObjectId.isValid(data.user)) {
     const user = await User.findOne({ clerkId: data.user });

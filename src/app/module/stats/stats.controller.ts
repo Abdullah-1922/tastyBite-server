@@ -23,8 +23,31 @@ const getAllStatsForUSer = catchAsync(async (req, res) => {
     success: true,
   });
 })
+const getTopThreeFoods = catchAsync(async (req, res) => {
+  const result = await StatsServices.topThreeFoods();
+
+  sendResponse(res, {
+    data: result,
+    message: "Top three foods fetched successfully",
+    statusCode: 200,
+    success: true,
+  });
+})
+const deliverymanOrderStats = catchAsync(async (req, res) => {
+  const result = await StatsServices.deliverymanOrderStats(req.params.userId);
+
+  sendResponse(res, {
+    data: result,
+    message: "Stats fetched successfully",
+    statusCode: 200,
+    success: true,
+  });
+})
+
 export const StatsController = {
   getAllStats,
   getAllStatsForUSer,
+  getTopThreeFoods,
+  deliverymanOrderStats,
 };
 

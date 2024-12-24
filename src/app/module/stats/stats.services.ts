@@ -1,3 +1,4 @@
+import AppError from "../../errors/AppError";
 import { Food } from "../Food/food.model";
 import { Order } from "../order/order.model";
 import { Staff } from "../staff/staff.model";
@@ -103,20 +104,94 @@ const getAllStats = async () => {
 };
 
 const getStatsForUser = async (userId: string) => {
-const user=await User.findOne({clerkId:userId})
+  const user = await User.findOne({ clerkId: userId });
 
-  const totalOrders = await Order.find({ user:user?._id }).countDocuments();
+  const totalOrders = await Order.find({ user: user?._id }).countDocuments();
   const runningOrders = await Order.find({
-    user:user?._id,
+    user: user?._id,
     isCompleted: false,
     isCancelled: false,
   }).countDocuments();
   const cancelledOrders = await Order.find({
-    user:user?._id,
+    user: user?._id,
     isCancelled: true,
   }).countDocuments();
   const completedOrders = await Order.find({
-    user:user?._id,
+    user: user?._id,
+    isCompleted: true,
+  }).countDocuments();
+
+  const userStats = {
+    totalOrders,
+    runningOrders,
+    cancelledOrders,
+    completedOrders,
+  };
+
+  return userStats;
+};
+const topThreeFoods = async () => {
+  const topThreeFoods = await Order.aggregate([
+    {
+      $unwind: "$foods", // Unwind the foods array
+    },
+    {
+      $lookup: {
+        from: "foods", // Replace with your actual Foods collection name
+        localField: "foods.foodId",
+        foreignField: "_id",
+        as: "foodDetails",
+      },
+    },
+    {
+      $unwind: { path: "$foodDetails", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $lookup: {
+        from: "menus", // Replace with your actual Menus collection name
+        localField: "foodDetails.menuId",
+        foreignField: "_id",
+        as: "menuDetails",
+      },
+    },
+    {
+      $unwind: { path: "$menuDetails", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $group: {
+        _id: "$foods.foodId",
+        totalOrders: { $sum: 1 },
+        name: { $first: "$foodDetails.name" },
+        images: { $first: "$foodDetails.images" },
+        category: { $first: { $ifNull: ["$menuDetails.name", "Unknown"] } },
+      },
+    },
+    { $sort: { totalOrders: -1 } },
+    { $limit: 3 },
+  ]);
+
+  return topThreeFoods;
+};
+
+const deliverymanOrderStats = async (userId: string) => {
+  const delivery = await User.findOne({ clerkId: userId,role: "delivery man"});
+  if (!delivery) {
+    throw new AppError(404, "User not found");
+  }
+  const totalOrders = await Order.find({
+    deliveryMan: delivery?._id,
+  }).countDocuments();
+  const runningOrders = await Order.find({
+    deliveryMan: delivery?._id,
+    isCompleted: false,
+    isCancelled: false,
+  }).countDocuments();
+  const cancelledOrders = await Order.find({
+    deliveryMan: delivery?._id,
+    isCancelled: true,
+  }).countDocuments();
+  const completedOrders = await Order.find({
+    deliveryMan: delivery?._id,
     isCompleted: true,
   }).countDocuments();
 
@@ -133,4 +208,6 @@ const user=await User.findOne({clerkId:userId})
 export const StatsServices = {
   getAllStats,
   getStatsForUser,
+  topThreeFoods,
+  deliverymanOrderStats,
 };
